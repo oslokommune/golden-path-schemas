@@ -1,16 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "gp-cicd-v0.0.1",
+  "$id": "gp-cicd-v0.0.2",
   "description": "Golden path CI/CD configuration for defining environment-specific deployment settings.",
   "type": "object",
-  "required": ["type", "team", "dev", "prod"],
+  "required": [
+    "type",
+    "team",
+    "dev",
+    "prod"
+  ],
   "properties": {
     "$schema": {
       "type": "string",
       "description": "Reference to the JSON schema file."
     },
     "type": {
-      "enum": ["infra", "app", "hybrid"],
+      "enum": [
+        "infra",
+        "app",
+        "hybrid"
+      ],
       "description": "Repository type. 'infra' contains only IaC. 'app' contains only application code and deploys via a separate infrastructure repository. 'hybrid' contains both application code and its own IaC stack."
     },
     "team": {
@@ -29,55 +38,88 @@
     "prod": true
   },
   "additionalProperties": false,
-
   "allOf": [
     {
       "if": {
-        "properties": { "type": { "const": "infra" } },
-        "required": ["type"]
+        "properties": {
+          "type": {
+            "const": "infra"
+          }
+        },
+        "required": [
+          "type"
+        ]
       },
       "then": {
         "properties": {
           "monorepo": false,
           "infrastructureRepository": false,
-          "dev": { "$ref": "#/$defs/infraEnvironment" },
-          "prod": { "$ref": "#/$defs/infraEnvironment" }
+          "dev": {
+            "$ref": "#/$defs/infraEnvironment"
+          },
+          "prod": {
+            "$ref": "#/$defs/infraEnvironment"
+          }
         }
       }
     },
     {
       "if": {
-        "properties": { "type": { "const": "app" } },
-        "required": ["type"]
+        "properties": {
+          "type": {
+            "const": "app"
+          }
+        },
+        "required": [
+          "type"
+        ]
       },
       "then": {
-        "required": ["infrastructureRepository"],
+        "required": [
+          "infrastructureRepository"
+        ],
         "properties": {
-          "dev": { "$ref": "#/$defs/appEnvironment" },
-          "prod": { "$ref": "#/$defs/appEnvironment" }
+          "dev": {
+            "$ref": "#/$defs/appEnvironment"
+          },
+          "prod": {
+            "$ref": "#/$defs/appEnvironment"
+          }
         }
       }
     },
     {
       "if": {
-        "properties": { "type": { "const": "hybrid" } },
-        "required": ["type"]
+        "properties": {
+          "type": {
+            "const": "hybrid"
+          }
+        },
+        "required": [
+          "type"
+        ]
       },
       "then": {
         "properties": {
           "infrastructureRepository": false,
-          "dev": { "$ref": "#/$defs/hybridEnvironment" },
-          "prod": { "$ref": "#/$defs/hybridEnvironment" }
+          "dev": {
+            "$ref": "#/$defs/hybridEnvironment"
+          },
+          "prod": {
+            "$ref": "#/$defs/hybridEnvironment"
+          }
         }
       }
     }
   ],
-
   "$defs": {
     "baseEnvironment": {
       "type": "object",
       "properties": {
-        "accountId": { "type": "string", "description": "AWS account ID." },
+        "accountId": {
+          "type": "string",
+          "description": "AWS account ID."
+        },
         "name": {
           "type": "string",
           "description": "Environment name (e.g., 'pirates-dev')."
@@ -91,7 +133,12 @@
           "description": "IAM role ARN for terraform apply."
         }
       },
-      "required": ["accountId", "name", "defaultRegion", "deploymentRoleArn"]
+      "required": [
+        "accountId",
+        "name",
+        "defaultRegion",
+        "deploymentRoleArn"
+      ]
     },
     "infraFields": {
       "properties": {
@@ -100,7 +147,9 @@
           "description": "IAM role ARN for terraform plan."
         }
       },
-      "required": ["planRoleArn"]
+      "required": [
+        "planRoleArn"
+      ]
     },
     "appFields": {
       "properties": {
@@ -130,23 +179,37 @@
     },
     "infraEnvironment": {
       "allOf": [
-        { "$ref": "#/$defs/baseEnvironment" },
-        { "$ref": "#/$defs/infraFields" }
+        {
+          "$ref": "#/$defs/baseEnvironment"
+        },
+        {
+          "$ref": "#/$defs/infraFields"
+        }
       ],
       "unevaluatedProperties": false
     },
     "appEnvironment": {
       "allOf": [
-        { "$ref": "#/$defs/baseEnvironment" },
-        { "$ref": "#/$defs/appFields" }
+        {
+          "$ref": "#/$defs/baseEnvironment"
+        },
+        {
+          "$ref": "#/$defs/appFields"
+        }
       ],
       "unevaluatedProperties": false
     },
     "hybridEnvironment": {
       "allOf": [
-        { "$ref": "#/$defs/baseEnvironment" },
-        { "$ref": "#/$defs/infraFields" },
-        { "$ref": "#/$defs/appFields" }
+        {
+          "$ref": "#/$defs/baseEnvironment"
+        },
+        {
+          "$ref": "#/$defs/infraFields"
+        },
+        {
+          "$ref": "#/$defs/appFields"
+        }
       ],
       "unevaluatedProperties": false
     }
