@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gp-cicd-v0.0.0",
+  "description": "Golden path CI/CD configuration for defining environment-specific deployment settings.",
+  "type": "object",
+  "required": ["type", "team", "dev", "prod"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to the JSON schema file."
+    },
+    "type": {
+      "enum": ["infra", "app", "hybrid"],
+      "description": "Repository type. 'infra' contains only IaC. 'app' contains only application code and deploys via a separate infrastructure repository. 'hybrid' contains both application code and its own IaC stack."
+    },
+    "team": {
+      "type": "string",
+      "description": "Team identifier, used for observability (e.g., Datadog)."
+    },
+    "monorepo": {
+      "type": "boolean",
+      "description": "Whether the repository contains multiple applications. Only allowed for 'app' and 'hybrid' types. Affects concurrency groups and GitHub Actions environment names."
+    },
+    "infrastructureRepository": {
+      "type": "string",
+      "description": "Name of the infrastructure repository (e.g., 'pirates-iac'). Required for 'app' type."
+    },
+    "dev": true,
+    "prod": true
+  },
+  "additionalProperties": false,
+
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "infra" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "monorepo": false,
+          "infrastructureRepository": false,
+          "dev": { "$ref": "#/$defs/infraEnvironment" },
+          "prod": { "$ref": "#/$defs/infraEnvironment" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "app" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["infrastructureRepository"],
+        "properties": {
+          "dev": { "$ref": "#/$defs/appEnvironment" },
+          "prod": { "$ref": "#/$defs/appEnvironment" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "hybrid" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "infrastructureRepository": false,
+          "dev": { "$ref": "#/$defs/hybridEnvironment" },
+          "prod": { "$ref": "#/$defs/hybridEnvironment" }
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+    "baseEnvironment": {
+      "type": "object",
+      "properties": {
+        "accountId": { "type": "string", "description": "AWS account ID." },
+        "name": {
+          "type": "string",
+          "description": "Environment name (e.g., 'pirates-dev')."
+        },
+        "defaultRegion": {
+          "type": "string",
+          "description": "AWS region (e.g., 'eu-west-1')."
+        },
+        "deploymentRoleArn": {
+          "type": "string",
+          "description": "IAM role ARN for terraform apply."
+        }
+      },
+      "required": ["accountId", "name", "defaultRegion", "deploymentRoleArn"]
+    },
+    "infraFields": {
+      "properties": {
+        "planRoleArn": {
+          "type": "string",
+          "description": "IAM role ARN for terraform plan."
+        }
+      },
+      "required": ["planRoleArn"]
+    },
+    "appFields": {
+      "properties": {
+        "artifactRoleArn": {
+          "type": "string",
+          "description": "IAM role ARN for publishing artifacts to S3/ECR."
+        },
+        "artifactBucketName": {
+          "type": "string",
+          "description": "S3 bucket name for storing build artifacts."
+        },
+        "artifactEcrRepositoryName": {
+          "type": "string",
+          "description": "ECR repository name for container images."
+        },
+        "infrastructureRoot": {
+          "type": "string",
+          "description": "Path to the environment's stack directory (e.g., 'stacks/dev')."
+        }
+      },
+      "required": [
+        "artifactRoleArn",
+        "artifactBucketName",
+        "artifactEcrRepositoryName",
+        "infrastructureRoot"
+      ]
+    },
+    "infraEnvironment": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvironment" },
+        { "$ref": "#/$defs/infraFields" }
+      ],
+      "unevaluatedProperties": false
+    },
+    "appEnvironment": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvironment" },
+        { "$ref": "#/$defs/appFields" }
+      ],
+      "unevaluatedProperties": false
+    },
+    "hybridEnvironment": {
+      "allOf": [
+        { "$ref": "#/$defs/baseEnvironment" },
+        { "$ref": "#/$defs/infraFields" },
+        { "$ref": "#/$defs/appFields" }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}
