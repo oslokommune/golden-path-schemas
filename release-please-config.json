@@ -1,0 +1,14 @@
+{
+  "release-type": "simple",
+  "separate-pull-requests": true,
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug fixes" }
+  ],
+  "packages": {
+    "gp-cicd": {
+      "component": "gp-cicd",
+      "release-type": "simple"
+    }
+  }
+}
