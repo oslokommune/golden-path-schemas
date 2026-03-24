@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "gp-cicd-v0.0.2",
+  "$id": "gp-cicd-v0.1.0",
   "description": "Golden path CI/CD configuration for defining environment-specific deployment settings.",
   "type": "object",
   "required": [
@@ -8,8 +8,16 @@
     "team"
   ],
   "anyOf": [
-    { "required": ["dev"] },
-    { "required": ["prod"] }
+    {
+      "required": [
+        "dev"
+      ]
+    },
+    {
+      "required": [
+        "prod"
+      ]
+    }
   ],
   "properties": {
     "$schema": {
