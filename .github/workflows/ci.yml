@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   validate-json:
-    name: Test OTel config generator
+    name: Validate JSON
 
     runs-on: ubuntu-24.04
 
