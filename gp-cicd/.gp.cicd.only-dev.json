@@ -1,10 +1,10 @@
 {
-  "$schema": "gp-cicd/schema.json",
+  "$schema": "schema.json",
   "type": "app",
   "team": "utviklerflyt",
   "monorepo": true,
   "infrastructureRepository": "pirates-iac",
-  "prod": {
+  "dev": {
     "accountId": "123456789012",
     "name": "pirates-dev",
     "defaultRegion": "eu-west-1",

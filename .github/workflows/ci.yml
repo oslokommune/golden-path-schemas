@@ -31,4 +31,5 @@ jobs:
           CHECK_JSONSCHEMA_VERSION: 0.37.0
         run: |
           pip install --quiet "check-jsonschema==$CHECK_JSONSCHEMA_VERSION"
-          check-jsonschema --schemafile "gp-cicd/schema.json" ".gp.cicd.example.json"
+          check-jsonschema --schemafile "gp-cicd/schema.json" "gp-cicd/.gp.cicd.only-dev.json"
+          check-jsonschema --schemafile "gp-cicd/schema.json" "gp-cicd/.gp.cicd.full.json"
