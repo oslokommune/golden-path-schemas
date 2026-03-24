@@ -5,9 +5,11 @@
   "type": "object",
   "required": [
     "type",
-    "team",
-    "dev",
-    "prod"
+    "team"
+  ],
+  "anyOf": [
+    { "required": ["dev"] },
+    { "required": ["prod"] }
   ],
   "properties": {
     "$schema": {
